@@ -7,222 +7,190 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0e1a;
-    --card: #1a2235;
-    --border: #1e3a5f;
-    --accent: #00d4ff;
-    --accent2: #ff6b35;
-    --green: #00e676;
-    --red: #ff3d5a;
-    --yellow: #ffd600;
-    --purple: #b388ff;
-    --teal: #00bfa5;
-    --text: #e8f4ff;
-    --muted: #6b8db8;
-    --font-mono: 'Space Mono', monospace;
-    --font-body: 'Noto Sans TC', sans-serif;
+    --bg: #0a0e1a; --card: #1a2235; --border: #1e3a5f;
+    --accent: #00d4ff; --accent2: #ff6b35; --green: #00e676;
+    --red: #ff3d5a; --yellow: #ffd600; --purple: #b388ff; --teal: #00bfa5;
+    --text: #e8f4ff; --muted: #6b8db8;
+    --font-mono: 'Space Mono', monospace; --font-body: 'Noto Sans TC', sans-serif;
   }
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 20%, rgba(0,212,255,0.05) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, rgba(255,107,53,0.05) 0%, transparent 50%);
+    background:var(--bg); color:var(--text); font-family:var(--font-body); min-height:100vh;
+    background-image: radial-gradient(ellipse at 20% 20%, rgba(0,212,255,.05) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 80%, rgba(255,107,53,.05) 0%, transparent 50%);
+  }
+
+  /* WATERMARK */
+  .watermark {
+    position:fixed; bottom:14px; right:16px; z-index:999;
+    font-family:var(--font-mono); font-size:10px;
+    color:rgba(255,255,255,0.13); letter-spacing:2px;
+    pointer-events:none; user-select:none;
   }
 
   /* HEADER */
   header {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(17,24,39,0.95);
-    backdrop-filter: blur(10px);
-    position: sticky; top: 0; z-index: 100;
+    padding:13px 16px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(17,24,39,.95); backdrop-filter:blur(10px);
+    position:sticky; top:0; z-index:100;
   }
-  .logo { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--accent); }
-  .logo span { color: var(--accent2); }
-  .status-bar { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
+  .logo { font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--accent); }
+  .logo span { color:var(--accent2); }
+  .header-right { display:flex; align-items:center; gap:8px; }
+  .status-bar { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); }
   .sdot { width:6px; height:6px; border-radius:50%; background:var(--muted); flex-shrink:0; }
-  .sdot.live { background:var(--green); box-shadow:0 0 6px var(--green); animation:pulse 2s infinite; }
-  .sdot.err  { background:var(--red); }
+  .sdot.live    { background:var(--green);  box-shadow:0 0 6px var(--green);  animation:pulse 2s infinite; }
+  .sdot.err     { background:var(--red); }
   .sdot.loading { background:var(--yellow); animation:pulse .6s infinite; }
+  .countdown {
+    font-family:var(--font-mono); font-size:10px; color:var(--muted);
+    background:rgba(255,255,255,.04); border:1px solid var(--border);
+    padding:3px 8px; border-radius:4px; min-width:42px; text-align:center;
+  }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-  /* MAIN */
-  .main { max-width: 900px; margin: 0 auto; padding: 16px 12px; display: grid; gap: 14px; }
+  /* FLASH */
+  @keyframes flashGreen { 0%{background:rgba(0,230,118,.2)} 100%{background:var(--card)} }
+  @keyframes flashRed   { 0%{background:rgba(255,61,90,.2)}  100%{background:var(--card)} }
+  .flash-up   { animation:flashGreen .9s ease-out forwards; }
+  .flash-down { animation:flashRed   .9s ease-out forwards; }
 
-  /* ETF BUTTONS */
-  .etf-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-  }
+  .main { max-width:900px; margin:0 auto; padding:14px 12px; display:grid; gap:12px; }
+
+  /* ETF GRID */
+  .etf-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; }
   .etf-btn {
-    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
-    padding: 10px 4px; border: 2px solid var(--border);
-    background: var(--card); color: var(--muted); border-radius: 8px;
-    cursor: pointer; transition: all .2s; letter-spacing: 0.5px;
-    text-align: center;
+    font-family:var(--font-mono); font-size:11px; font-weight:700;
+    padding:10px 3px; border:2px solid var(--border);
+    background:var(--card); color:var(--muted); border-radius:8px;
+    cursor:pointer; transition:all .2s; text-align:center; line-height:1;
   }
-  .etf-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .etf-btn .etf-name { font-size: 9px; display: block; margin-top: 3px; opacity: .6; font-family: var(--font-body); font-weight: 400; letter-spacing: 0; }
-
+  .etf-btn .etf-name { font-size:8px; display:block; margin-top:4px; opacity:.55; font-family:var(--font-body); font-weight:400; }
   .etf-btn.active-smh  { border-color:var(--accent2); background:rgba(255,107,53,.12); color:var(--accent2); }
   .etf-btn.active-voo  { border-color:var(--accent);  background:rgba(0,212,255,.1);   color:var(--accent);  }
   .etf-btn.active-qqq  { border-color:var(--purple);  background:rgba(179,136,255,.1); color:var(--purple);  }
   .etf-btn.active-0050 { border-color:var(--teal);    background:rgba(0,191,165,.1);   color:var(--teal);    }
   .etf-btn.active-tw   { border-color:var(--yellow);  background:rgba(255,214,0,.1);   color:var(--yellow);  }
 
-  /* FETCH BUTTON */
   .fetch-btn {
-    font-family: var(--font-mono); font-size: 14px;
-    padding: 14px; background: linear-gradient(135deg, var(--accent), #0099cc);
-    color: #000; font-weight: 700; border: none; border-radius: 8px;
-    cursor: pointer; transition: all .2s; letter-spacing: 1px; width: 100%;
+    font-family:var(--font-mono); font-size:14px; padding:13px;
+    background:linear-gradient(135deg, var(--accent), #0099cc);
+    color:#000; font-weight:700; border:none; border-radius:8px;
+    cursor:pointer; width:100%; transition:all .2s;
   }
-  .fetch-btn:active { transform: scale(.98); }
+  .fetch-btn:active { transform:scale(.98); }
   .fetch-btn:disabled { opacity:.5; cursor:not-allowed; }
 
   /* PRICE PANEL */
   .price-panel {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-    position: relative; overflow: hidden;
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:15px; display:grid; grid-template-columns:1fr 1fr; gap:14px;
+    position:relative; overflow:hidden;
   }
-  .price-panel::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-  }
+  .price-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--accent), var(--accent2)); }
   .pstat { display:flex; flex-direction:column; gap:4px; }
   .pstat label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
-  .pval { font-family:var(--font-mono); font-size:22px; font-weight:700; }
-  .pval.c-accent { color:var(--accent); }
-  .pval.c-green  { color:var(--green); }
-  .pval.c-red    { color:var(--red); }
-  .pval.c-yellow { color:var(--yellow); }
+  .pval { font-family:var(--font-mono); font-size:21px; font-weight:700; }
+  .pval.c-accent{color:var(--accent);} .pval.c-green{color:var(--green);}
+  .pval.c-red{color:var(--red);} .pval.c-yellow{color:var(--yellow);}
   .psub { font-size:11px; color:var(--muted); }
-  .pchange.up   { color:var(--green); }
-  .pchange.down { color:var(--red); }
+  .pchange.up{color:var(--green);} .pchange.down{color:var(--red);}
 
-  /* SECTION TITLE */
-  .sec { font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:3px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .sec { font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:3px; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
   .sec::after { content:''; flex:1; height:1px; background:var(--border); }
 
   /* DROP CARDS */
-  .drop-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
-  @media(max-width:480px) { .drop-grid { grid-template-columns:repeat(2, 1fr); } }
-
+  .drop-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  @media(max-width:480px) { .drop-grid { grid-template-columns:repeat(2,1fr); } }
   .drop-card {
     background:var(--card); border:1px solid var(--border); border-radius:10px;
-    padding:12px; transition:all .2s; position:relative; overflow:hidden;
+    padding:11px; position:relative; overflow:hidden; transition:border-color .3s;
   }
-  .drop-card.is-below { border-color:rgba(0,230,118,.35); background:rgba(0,230,118,.04); }
-  .dpct { font-family:var(--font-mono); font-size:18px; font-weight:700; margin-bottom:3px; }
-  .dpct.mild { color:var(--yellow); }
-  .dpct.moderate { color:var(--accent2); }
-  .dpct.deep { color:var(--red); }
-  .dprice { font-family:var(--font-mono); font-size:15px; color:var(--text); }
+  .drop-card.is-below { border-color:rgba(0,230,118,.4); background:rgba(0,230,118,.05); }
+  .dpct { font-family:var(--font-mono); font-size:17px; font-weight:700; margin-bottom:3px; }
+  .dpct.mild{color:var(--yellow);} .dpct.moderate{color:var(--accent2);} .dpct.deep{color:var(--red);}
+  .dprice { font-family:var(--font-mono); font-size:14px; color:var(--text); }
   .dfrom { font-size:10px; margin-top:3px; }
-  .dfrom.above { color:var(--muted); }
-  .dfrom.below { color:var(--green); font-weight:500; }
-  .reached-badge {
-    position:absolute; top:8px; right:8px;
+  .dfrom.above{color:var(--muted);} .dfrom.below{color:var(--green); font-weight:500;}
+  .reached-badge { position:absolute; top:7px; right:7px;
     font-size:8px; font-weight:700; padding:2px 5px;
-    background:var(--green); color:#000; border-radius:3px; letter-spacing:1px;
-  }
+    background:var(--green); color:#000; border-radius:3px; }
 
   /* CALCULATOR */
   .calc-panel {
     background:var(--card); border:1px solid var(--border); border-radius:12px;
-    padding:16px; position:relative; overflow:hidden;
+    padding:15px; position:relative; overflow:hidden;
   }
-  .calc-panel::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background:linear-gradient(90deg, var(--accent2), var(--yellow));
-  }
-  .calc-rows { display:grid; gap:8px; margin-bottom:16px; }
-  .calc-row { display:grid; grid-template-columns:70px 1fr 1fr; gap:8px; align-items:center; }
+  .calc-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--accent2), var(--yellow)); }
+  .calc-rows { display:grid; gap:7px; margin-bottom:14px; }
+  .calc-row { display:grid; grid-template-columns:65px 105px 1fr 75px; gap:7px; align-items:center; }
   .clabel { font-family:var(--font-mono); font-size:13px; font-weight:700; }
-  .clabel.mild { color:var(--yellow); }
-  .clabel.moderate { color:var(--accent2); }
-  .clabel.deep { color:var(--red); }
-  .cref { font-size:12px; color:var(--muted); font-family:var(--font-mono); }
+  .clabel.mild{color:var(--yellow);} .clabel.moderate{color:var(--accent2);} .clabel.deep{color:var(--red);}
+  .cref { font-size:11px; color:var(--muted); font-family:var(--font-mono); }
   .cinput {
-    font-family:var(--font-mono); font-size:14px;
+    font-family:var(--font-mono); font-size:13px;
     background:var(--bg); border:1px solid var(--border);
-    color:var(--text); padding:9px 10px; border-radius:6px; text-align:right; width:100%;
+    color:var(--text); padding:8px 9px; border-radius:6px; text-align:right; width:100%;
   }
   .cinput:focus { outline:none; border-color:var(--accent); }
-  .cinput::placeholder { color:var(--muted); opacity:.5; font-size:12px; }
+  .cinput::placeholder { color:var(--muted); opacity:.45; font-size:11px; }
+  .cshares { font-family:var(--font-mono); font-size:11px; color:var(--accent); text-align:right; line-height:1.3; }
 
-  .calc-total {
-    border-top:1px solid var(--border); padding-top:16px;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-  }
-  .tlabel { font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:4px; }
-  .tval { font-family:var(--font-mono); font-size:28px; font-weight:700; color:var(--green); }
-  .clear-btn {
-    font-family:var(--font-mono); font-size:11px; padding:10px 16px;
+  .calc-total { border-top:1px solid var(--border); padding-top:14px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .tlabel { font-family:var(--font-mono); font-size:10px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:2px; margin-bottom:3px; }
+  .tval { font-family:var(--font-mono); font-size:26px; font-weight:700; color:var(--green); }
+  .clear-btn { font-family:var(--font-mono); font-size:11px; padding:9px 14px;
     background:transparent; border:1px solid var(--border); color:var(--muted);
-    border-radius:6px; cursor:pointer; transition:all .2s; white-space:nowrap;
-  }
+    border-radius:6px; cursor:pointer; white-space:nowrap; }
   .clear-btn:active { border-color:var(--red); color:var(--red); }
 
-  .note { font-size:11px; color:var(--muted); background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:6px; padding:12px; line-height:1.8; }
+  .note { font-size:11px; color:var(--muted); background:rgba(255,255,255,.02);
+    border:1px solid var(--border); border-radius:6px; padding:11px; line-height:1.8; }
   .note strong { color:var(--accent); }
 
-  /* Desktop tweaks */
   @media(min-width:600px) {
-    .main { padding: 24px 20px; gap: 20px; }
-    .etf-btn { font-size: 14px; padding: 12px 8px; }
-    .etf-btn .etf-name { font-size: 10px; }
-    .price-panel { grid-template-columns: repeat(4, 1fr); }
-    .pval { font-size: 26px; }
-    .drop-grid { grid-template-columns: repeat(4, 1fr); }
-    .calc-row { grid-template-columns: 85px 145px 1fr; }
+    .main { padding:22px 20px; gap:18px; }
+    .etf-btn { font-size:13px; padding:12px 5px; }
+    .etf-btn .etf-name { font-size:9px; }
+    .price-panel { grid-template-columns:repeat(4,1fr); }
+    .pval { font-size:24px; }
+    .calc-row { grid-template-columns:75px 130px 1fr 90px; }
   }
 </style>
 </head>
 <body>
 
+<div class="watermark">少華製作</div>
+
 <header>
-  <div>
-    <div class="logo">ETF <span>DIP</span> TRACKER</div>
-  </div>
-  <div class="status-bar">
-    <div class="sdot" id="sdot"></div>
-    <span id="stext">選擇 ETF</span>
+  <div class="logo">ETF <span>DIP</span> TRACKER</div>
+  <div class="header-right">
+    <div class="countdown" id="countdown" style="display:none">5:00</div>
+    <div class="status-bar">
+      <div class="sdot" id="sdot"></div>
+      <span id="stext">選擇 ETF</span>
+    </div>
   </div>
 </header>
 
 <div class="main">
 
-  <!-- ETF 選擇 -->
   <div class="etf-grid">
-    <button class="etf-btn active-smh" data-etf="SMH" onclick="selectETF('SMH')">
-      SMH<span class="etf-name">半導體</span>
-    </button>
-    <button class="etf-btn" data-etf="VOO" onclick="selectETF('VOO')">
-      VOO<span class="etf-name">S&P 500</span>
-    </button>
-    <button class="etf-btn" data-etf="QQQ" onclick="selectETF('QQQ')">
-      QQQ<span class="etf-name">那斯達克</span>
-    </button>
-    <button class="etf-btn" data-etf="0050" onclick="selectETF('0050')">
-      0050<span class="etf-name">台灣50</span>
-    </button>
-    <button class="etf-btn" data-etf="00981A" onclick="selectETF('00981A')">
-      00981A<span class="etf-name">元大半導體</span>
-    </button>
+    <button class="etf-btn active-smh" data-etf="SMH"    onclick="selectETF('SMH')">SMH<span class="etf-name">半導體</span></button>
+    <button class="etf-btn"            data-etf="VOO"    onclick="selectETF('VOO')">VOO<span class="etf-name">S&P 500</span></button>
+    <button class="etf-btn"            data-etf="QQQ"    onclick="selectETF('QQQ')">QQQ<span class="etf-name">那斯達克</span></button>
+    <button class="etf-btn"            data-etf="0050"   onclick="selectETF('0050')">0050<span class="etf-name">台灣50</span></button>
+    <button class="etf-btn"            data-etf="00981A" onclick="selectETF('00981A')">00981A<span class="etf-name">元大半導體</span></button>
   </div>
 
-  <!-- 抓取按鈕 -->
   <button class="fetch-btn" id="fetchBtn" onclick="fetchData()">▶ 自動抓取最新價格</button>
 
-  <!-- 價格摘要 -->
   <div class="price-panel" id="pricePanel" style="display:none">
     <div class="pstat">
       <label>今日收盤</label>
@@ -246,13 +214,11 @@
     </div>
   </div>
 
-  <!-- 下跌對照表 -->
   <div id="dropSection" style="display:none">
     <div class="sec">下跌價位對照表</div>
     <div class="drop-grid" id="dropGrid"></div>
   </div>
 
-  <!-- 加碼計算器 -->
   <div id="calcSection" style="display:none">
     <div class="calc-panel">
       <div class="sec">加碼金額計算器</div>
@@ -268,7 +234,7 @@
   </div>
 
   <div class="note">
-    💡 資料來源 <strong>Yahoo Finance</strong>，ATH 以近 5 年最高收盤價計算。點選 ETF 後按「自動抓取」即可。
+    💡 資料來源 <strong>Yahoo Finance</strong>，ATH 以近 5 年最高收盤價計算。每 <strong>5 分鐘</strong>自動更新一次。台股顯示張數，美股顯示股數。
   </div>
 
 </div>
@@ -281,43 +247,69 @@ const ETFS = {
   '0050':   { label:'0050',   name:'元大台灣50',       symbol:'0050.TW',   currency:'TWD', prefix:'NT$', dec:2, activeClass:'active-0050' },
   '00981A': { label:'00981A', name:'元大半導體',       symbol:'00981A.TW', currency:'TWD', prefix:'NT$', dec:2, activeClass:'active-tw'   },
 };
-
 const DROPS = [10,15,20,25,30,35,40,45];
+const REFRESH_SEC = 300;
+
 let curETF = 'SMH';
+let lastClose = null;
+let autoTimer = null;
+let countdownTimer = null;
+let secondsLeft = 0;
 
 function selectETF(etf) {
-  curETF = etf;
+  curETF = etf; lastClose = null;
   document.querySelectorAll('.etf-btn').forEach(b => {
     b.className = 'etf-btn';
     if (b.dataset.etf === etf) b.classList.add(ETFS[etf].activeClass);
   });
   hideResults();
   setStatus('', '按下抓取');
+  stopAuto();
+  document.getElementById('countdown').style.display = 'none';
 }
 
 function setStatus(type, msg) {
-  const dot = document.getElementById('sdot');
-  dot.className = 'sdot' + (type ? ' '+type : '');
+  document.getElementById('sdot').className = 'sdot'+(type?' '+type:'');
   document.getElementById('stext').textContent = msg;
 }
-
 function hideResults() {
   ['pricePanel','dropSection','calcSection'].forEach(id => document.getElementById(id).style.display='none');
 }
-
 function fmt(v, dec, prefix) {
   if (v===null||isNaN(v)) return '—';
   return prefix + v.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g,',');
 }
-
+function fmtShares(amount, price, currency) {
+  if (!amount || !price || amount<=0 || price<=0) return '—';
+  if (currency === 'TWD') {
+    const lots = Math.floor(amount / (price * 1000));
+    const shares = Math.floor(amount / price);
+    return lots >= 1 ? `${lots}張` : `${shares}股`;
+  }
+  return Math.floor(amount / price) + ' 股';
+}
 function dropClass(pct) { return pct<=15?'mild':pct<=30?'moderate':'deep'; }
 
-async function fetchData() {
-  const btn = document.getElementById('fetchBtn');
-  btn.disabled = true;
-  btn.textContent = '載入中...';
-  setStatus('loading', '連線中...');
+function stopAuto() { clearInterval(autoTimer); clearInterval(countdownTimer); }
 
+function startAuto() {
+  stopAuto();
+  secondsLeft = REFRESH_SEC;
+  const el = document.getElementById('countdown');
+  el.style.display = '';
+  countdownTimer = setInterval(() => {
+    secondsLeft--;
+    const m = Math.floor(secondsLeft/60), s = secondsLeft%60;
+    el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    if (secondsLeft <= 0) clearInterval(countdownTimer);
+  }, 1000);
+  autoTimer = setInterval(() => fetchData(true), REFRESH_SEC * 1000);
+}
+
+async function fetchData(silent=false) {
+  const btn = document.getElementById('fetchBtn');
+  if (!silent) { btn.disabled=true; btn.textContent='載入中...'; }
+  setStatus('loading', '連線中...');
   const cfg = ETFS[curETF];
   try {
     const res = await fetch(`/api/quote?symbol=${cfg.symbol}`);
@@ -325,84 +317,105 @@ async function fetchData() {
     const d = await res.json();
     if (d.error) throw new Error(d.error);
     render(d.close, d.ath, d.ath_date, d.change, d.change_pct);
-    const t = new Date().toLocaleTimeString('zh-TW');
-    setStatus('live', `更新 ${t}`);
+    setStatus('live', `更新 ${new Date().toLocaleTimeString('zh-TW')}`);
+    startAuto();
   } catch(e) {
-    setStatus('err', '抓取失敗，請稍後再試');
+    setStatus('err', '抓取失敗');
   }
-
-  btn.disabled = false;
-  btn.textContent = '▶ 自動抓取最新價格';
+  if (!silent) { btn.disabled=false; btn.textContent='▶ 自動抓取最新價格'; }
 }
 
 function render(close, ath, athDate, change, changePct) {
   const cfg = ETFS[curETF];
   const { prefix, dec, label, name, currency } = cfg;
 
+  // Flash
+  const panel = document.getElementById('pricePanel');
+  if (lastClose !== null && close !== lastClose) {
+    panel.classList.remove('flash-up','flash-down');
+    void panel.offsetWidth;
+    panel.classList.add(close > lastClose ? 'flash-up' : 'flash-down');
+  }
+  lastClose = close;
+
   document.getElementById('dispClose').textContent = fmt(close, dec, prefix);
   const chgEl = document.getElementById('dispChange');
   if (change !== null) {
-    const sign = change >= 0 ? '+' : '';
-    chgEl.textContent = `${sign}${fmt(change, dec, prefix)} (${sign}${changePct.toFixed(2)}%)`;
-    chgEl.className = 'psub pchange ' + (change >= 0 ? 'up' : 'down');
+    const s = change>=0?'+':'';
+    chgEl.textContent = `${s}${fmt(change,dec,prefix)} (${s}${changePct.toFixed(2)}%)`;
+    chgEl.className = 'psub pchange '+(change>=0?'up':'down');
   }
-
   document.getElementById('dispATH').textContent = fmt(ath, dec, prefix);
-  document.getElementById('dispATHDate').textContent = athDate ? athDate : '—';
-
-  const diff = ((close - ath) / ath) * 100;
+  document.getElementById('dispATHDate').textContent = athDate||'—';
+  const diff = ((close-ath)/ath)*100;
   const diffEl = document.getElementById('dispDiff');
-  diffEl.textContent = diff.toFixed(2) + '%';
-  diffEl.className = 'pval ' + (diff < -20 ? 'c-red' : diff < -5 ? 'c-yellow' : 'c-green');
-
+  diffEl.textContent = diff.toFixed(2)+'%';
+  diffEl.className = 'pval '+(diff<-20?'c-red':diff<-5?'c-yellow':'c-green');
   document.getElementById('dispName').textContent = label;
   document.getElementById('dispCurr').textContent = `${name} · ${currency}`;
 
-  // drop cards
+  // Drop cards
   const grid = document.getElementById('dropGrid');
   grid.innerHTML = '';
   DROPS.forEach(pct => {
-    const target = ath * (1 - pct/100);
-    const rel = ((close - target) / target) * 100;
-    const isBelow = close <= target;
+    const target = ath*(1-pct/100);
+    const isBelow = close<=target;
     const cls = dropClass(pct);
+    const needDrop = ((close-target)/close*100).toFixed(1);
     const card = document.createElement('div');
-    card.className = 'drop-card' + (isBelow ? ' is-below' : '');
+    card.className = 'drop-card'+(isBelow?' is-below':'');
     card.innerHTML = `
-      ${isBelow ? '<div class="reached-badge">✓ 已到達</div>' : ''}
+      ${isBelow?'<div class="reached-badge">✓ 已到達</div>':''}
       <div class="dpct ${cls}">-${pct}%</div>
-      <div class="dprice">${fmt(target, dec, prefix)}</div>
-      <div class="dfrom ${isBelow?'below':'above'}">
-        ${isBelow ? `已低 ${Math.abs(rel).toFixed(1)}%` : `還差 ${rel.toFixed(1)}%`}
-      </div>`;
+      <div class="dprice">${fmt(target,dec,prefix)}</div>
+      <div class="dfrom ${isBelow?'below':'above'}">${isBelow?'✓ 已到達':'再跌 '+needDrop+'%'}</div>`;
     grid.appendChild(card);
   });
 
-  // calc rows
+  // Preserve calc values
+  const saved = {};
+  document.querySelectorAll('.cinput').forEach(i => { if(i.value) saved[i.dataset.pct]=i.value; });
+
   const rows = document.getElementById('calcRows');
   rows.innerHTML = '';
   DROPS.forEach(pct => {
-    const target = ath * (1 - pct/100);
+    const target = ath*(1-pct/100);
     const cls = dropClass(pct);
     const row = document.createElement('div');
     row.className = 'calc-row';
     row.innerHTML = `
       <div class="clabel ${cls}">-${pct}%</div>
-      <div class="cref">${fmt(target, dec, prefix)}</div>
-      <input class="cinput" type="number" min="0" step="100"
-        placeholder="加碼金額" oninput="calcTotal()" inputmode="numeric" />`;
+      <div class="cref">${fmt(target,dec,prefix)}</div>
+      <input class="cinput" type="number" min="0" step="100" inputmode="numeric"
+        placeholder="加碼金額" data-pct="${pct}" data-price="${target.toFixed(4)}"
+        oninput="calcTotal()" />
+      <div class="cshares" id="sh-${pct}">—</div>`;
     rows.appendChild(row);
+  });
+
+  Object.entries(saved).forEach(([pct,val]) => {
+    const inp = document.querySelector(`.cinput[data-pct="${pct}"]`);
+    if (inp) { inp.value=val; refreshShares(inp); }
   });
 
   calcTotal();
   ['pricePanel','dropSection','calcSection'].forEach(id => document.getElementById(id).style.display='');
 }
 
+function refreshShares(input) {
+  const pct = input.dataset.pct;
+  const price = parseFloat(input.dataset.price);
+  const amount = parseFloat(input.value);
+  const cfg = ETFS[curETF];
+  document.getElementById(`sh-${pct}`).textContent = fmtShares(amount, price, cfg.currency);
+}
+
 function calcTotal() {
   let total = 0;
   document.querySelectorAll('.cinput').forEach(i => {
     const v = parseFloat(i.value);
-    if (!isNaN(v) && v > 0) total += v;
+    if (!isNaN(v)&&v>0) { total+=v; refreshShares(i); }
+    else { const el=document.getElementById(`sh-${i.dataset.pct}`); if(el) el.textContent='—'; }
   });
   const cfg = ETFS[curETF];
   document.getElementById('totalAmt').textContent =
@@ -411,6 +424,7 @@ function calcTotal() {
 
 function clearCalc() {
   document.querySelectorAll('.cinput').forEach(i => i.value='');
+  document.querySelectorAll('.cshares').forEach(el => el.textContent='—');
   calcTotal();
 }
 </script>

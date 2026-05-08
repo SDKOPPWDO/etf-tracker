@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 import urllib.request
-import json
+import json, datetime
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -15,7 +15,6 @@ def fetch(url):
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # parse symbol from path: /api/quote?symbol=SMH
         from urllib.parse import urlparse, parse_qs
         qs = parse_qs(urlparse(self.path).query)
         symbol = qs.get("symbol", ["SMH"])[0].upper()
@@ -23,8 +22,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             # Current price
             quote_url = f"https://query2.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=1d"
-            quote_data = fetch(quote_url)
-            meta = quote_data["chart"]["result"][0]["meta"]
+            meta = fetch(quote_url)["chart"]["result"][0]["meta"]
             close = meta.get("regularMarketPrice") or meta.get("chartPreviousClose")
             prev  = meta.get("chartPreviousClose", close)
             change = close - prev
@@ -32,15 +30,19 @@ class handler(BaseHTTPRequestHandler):
 
             # 5Y history for ATH
             hist_url = f"https://query2.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5y"
-            hist_data = fetch(hist_url)
-            closes     = [x for x in hist_data["chart"]["result"][0]["indicators"]["quote"][0]["close"] if x]
-            timestamps = hist_data["chart"]["result"][0]["timestamp"]
+            hist = fetch(hist_url)["chart"]["result"][0]
+            closes     = [x for x in hist["indicators"]["quote"][0]["close"] if x]
+            timestamps = hist["timestamp"]
             ath        = max(closes)
-            ath_idx    = closes.index(ath)
-            ath_ts     = timestamps[ath_idx]
+            ath_date   = datetime.datetime.utcfromtimestamp(timestamps[closes.index(ath)]).strftime("%Y-%m-%d")
 
-            import datetime
-            ath_date = datetime.datetime.utcfromtimestamp(ath_ts).strftime("%Y-%m-%d")
+            # USD/TWD exchange rate
+            usdtwd = None
+            try:
+                fx = fetch("https://query2.finance.yahoo.com/v8/finance/chart/USDTWD=X?interval=1d&range=1d")
+                usdtwd = fx["chart"]["result"][0]["meta"].get("regularMarketPrice")
+            except:
+                pass
 
             result = {
                 "symbol": symbol,
@@ -50,6 +52,7 @@ class handler(BaseHTTPRequestHandler):
                 "change_pct": round(change_pct, 4),
                 "ath": round(ath, 4),
                 "ath_date": ath_date,
+                "usdtwd": round(usdtwd, 2) if usdtwd else None,
             }
             body = json.dumps(result).encode()
             self.send_response(200)

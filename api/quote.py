@@ -31,10 +31,10 @@ class handler(BaseHTTPRequestHandler):
             # 5Y history for ATH
             hist_url = f"https://query2.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5y"
             hist = fetch(hist_url)["chart"]["result"][0]
-            closes     = [x for x in hist["indicators"]["quote"][0]["close"] if x]
+            highs      = [x for x in hist["indicators"]["quote"][0]["high"] if x]
             timestamps = hist["timestamp"]
-            ath        = max(closes)
-            ath_date   = datetime.datetime.utcfromtimestamp(timestamps[closes.index(ath)]).strftime("%Y-%m-%d")
+            ath        = max(highs)
+            ath_date   = datetime.datetime.utcfromtimestamp(timestamps[highs.index(ath)]).strftime("%Y-%m-%d")
 
             # USD/TWD exchange rate
             usdtwd = None

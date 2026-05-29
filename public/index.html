@@ -140,7 +140,7 @@
   .cinput{
     font-family:var(--font-mono);font-size:13px;
     background:var(--bg);border:1px solid var(--border);
-    color:var(--text);padding:8px 9px;border-radius:6px;text-align:right;width:100%;
+    color:var(--text);padding:8px 12px;border-radius:6px;text-align:right;width:100%;min-width:140px;
   }
   .cinput:focus{outline:none;border-color:var(--accent);}
   .cinput::placeholder{color:var(--muted);opacity:.45;font-size:11px;}
@@ -428,9 +428,12 @@ function render(close, ath, athDate, change, changePct) {
     noteEl.innerHTML = `美股以 <strong>USD</strong> 計價，請輸入 <strong>台幣</strong> 金額，系統自動以匯率 <strong>1 USD = NT$${usdtwd.toFixed(2)}</strong> 換算。支援碎股。`;
   }
 
-  // Preserve values
-  const saved = {};
-  document.querySelectorAll('.cinput').forEach(i => { if(i.value) saved[i.dataset.pct]=i.value; });
+  // Save current values to localStorage before rebuild
+  document.querySelectorAll('.cinput').forEach(i => {
+    const key = `etf_input_${curETF}_${i.dataset.pct}`;
+    if(i.value) localStorage.setItem(key, i.value);
+    else localStorage.removeItem(key);
+  });
 
   const rows = document.getElementById('calcRows');
   rows.innerHTML = '';
@@ -448,9 +451,11 @@ function render(close, ath, athDate, change, changePct) {
     rows.appendChild(row);
   });
 
-  Object.entries(saved).forEach(([pct,val]) => {
-    const inp = document.querySelector(`.cinput[data-pct="${pct}"]`);
-    if (inp) { inp.value=val; refreshShares(inp); }
+  // Restore values from localStorage
+  document.querySelectorAll('.cinput').forEach(inp => {
+    const key = `etf_input_${curETF}_${inp.dataset.pct}`;
+    const val = localStorage.getItem(key);
+    if(val){ inp.value=val; refreshShares(inp); }
   });
 
   calcTotal();
@@ -465,7 +470,16 @@ function refreshShares(input) {
   document.getElementById(`sh-${pct}`).textContent = calcShares(amount, price, cfg.isTW);
 }
 
+function saveInputs() {
+  document.querySelectorAll('.cinput').forEach(i => {
+    const key = `etf_input_${curETF}_${i.dataset.pct}`;
+    if(i.value) localStorage.setItem(key, i.value);
+    else localStorage.removeItem(key);
+  });
+}
+
 function calcTotal() {
+  saveInputs();
   let total = 0;
   document.querySelectorAll('.cinput').forEach(i => {
     const v = parseFloat(i.value);

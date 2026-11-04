@@ -248,7 +248,7 @@
   </div>
 
   <div id="dropSection" style="display:none">
-    <div class="sec">下跌價位對照表</div>
+    <div class="sec">下跌價位對照表（每階再跌 10%）</div>
     <div class="drop-grid" id="dropGrid"></div>
   </div>
 
@@ -312,7 +312,12 @@ const ETFS = {
   '00981A': {label:'00981A', name:'元大半導體',       symbol:'00981A.TW', currency:'TWD', prefix:'NT$', dec:2, activeClass:'active-tw',   isTW:true},
   '2454':   {label:'2454',   name:'聯發科',           symbol:'2454.TW',   currency:'TWD', prefix:'NT$', dec:2, activeClass:'active-2454', isTW:true},
 };
-const DROPS = [10,15,20,25,30,35,40,45,50,55,60,65,70];
+// 每階都從上一階再跌 10%：價格 = 最高價 × 0.9^階數
+const DROPS = Array.from({length:12}, (_, i) => {
+  const ratio = Math.pow(0.9, i + 1);
+  const pct = (1 - ratio) * 100;
+  return {id:`r${i + 1}`, ratio, pct, label:`-${Number(pct.toFixed(1))}%`};
+});
 const REFRESH_SEC = 300;
 
 let curETF = 'SMH';
@@ -446,15 +451,15 @@ function render(close, ath, athDate, change, changePct) {
   // Drop cards
   const grid = document.getElementById('dropGrid');
   grid.innerHTML = '';
-  DROPS.forEach(pct => {
-    const target = ath*(1-pct/100);
+  DROPS.forEach(d => {
+    const target = ath*d.ratio;
     const isBelow = close<=target;
     const needDrop = ((close-target)/close*100).toFixed(1);
     const card = document.createElement('div');
     card.className = 'drop-card'+(isBelow?' is-below':'');
     card.innerHTML = `
       ${isBelow?'<div class="reached-badge">✓ 已到達</div>':''}
-      <div class="dpct ${dropClass(pct)}">-${pct}%</div>
+      <div class="dpct ${dropClass(d.pct)}">${d.label}</div>
       <div class="dprice">${fmt(target,dec,prefix)}</div>
       <div class="dfrom ${isBelow?'below':'above'}">${isBelow?'✓ 已到達':'再跌 '+needDrop+'%'}</div>`;
     grid.appendChild(card);
@@ -480,19 +485,19 @@ function render(close, ath, athDate, change, changePct) {
 
   const rows = document.getElementById('calcRows');
   rows.innerHTML = '';
-  DROPS.forEach(pct => {
-    const target = ath*(1-pct/100);
+  DROPS.forEach(d => {
+    const target = ath*d.ratio;
     const row = document.createElement('div');
     row.className = 'calc-row';
     row.innerHTML = `
-      <div class="clabel ${dropClass(pct)}">-${pct}%</div>
+      <div class="clabel ${dropClass(d.pct)}">${d.label}</div>
       <div class="cref">${fmt(target,dec,prefix)}</div>
       <input class="cmult" type="number" min="0" step="0.5" inputmode="decimal"
-        placeholder="x" data-pct="${pct}" data-price="${target.toFixed(6)}"
+        placeholder="x" data-pct="${d.id}" data-price="${target.toFixed(6)}"
         oninput="calcTotal()"
         style="font-family:var(--font-mono);font-size:13px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;text-align:center;width:100%;" />
-      <div class="camt" id="amt-${pct}" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-align:right;">—</div>
-      <div class="cshares ${isTW?'twstock':''}" id="sh-${pct}">—</div>`;
+      <div class="camt" id="amt-${d.id}" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-align:right;">—</div>
+      <div class="cshares ${isTW?'twstock':''}" id="sh-${d.id}">—</div>`;
     rows.appendChild(row);
   });
 
